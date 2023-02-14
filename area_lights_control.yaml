@@ -31,7 +31,7 @@ blueprint:
 
 variables:
   button_incr: !input action_increase_brightness
-  pressed_button: '{{ trigger.payload_json.rfReceived.rfData}}'
+  pressed_button: '{{ trigger.payload_json.RfReceived.Data}}'
   area_id: !input area_id
 
 trigger:
