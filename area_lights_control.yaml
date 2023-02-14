@@ -1,0 +1,58 @@
+blueprint:
+  name: Area Light management through mqtt
+  description: 'Area Light management through mqtt'
+  domain: automation
+  input:
+    area_id:
+      name: area_id
+      description: 'Choose area to control'
+      selector:
+        area:
+    action_increase_brightness:
+      name: increase_brightness
+      description: 'Put tag id that commands brightness increase'
+      selector:
+        text:
+    action_decrease_brightness:
+      name: decrease_brightness
+      description: 'Put tag id that commands brightness decrease'
+      selector:
+        text:
+    action_rotate_color:
+      name: rotate_color
+      description: select tag id that changes color
+      selector:
+        text:
+    action_kelvin_value:
+      name: change_kelvin_value
+      description: select tag that changes kelvin value
+      selector:
+        text:
+
+variables:
+  button_incr: !input increase_brightness
+  pressed_button: '{{ trigger.payload_json.rfReceived.rfData}}'
+  area_id: !input area_id
+
+trigger:
+  - platform: mqtt
+    topic: tele/BRIDGE/RESULT
+
+
+action:
+  - choose:
+      - conditions:
+        - condition: template
+          value_template: '{{pressed_button == button_incr}}'
+        sequence:
+          - service: mqtt.publish
+            data: 
+              topic: testes
+              payload_template: >-
+                {
+                  action: 'increase_brightness',
+                  pressed_button: ''{{ pressed_button }}'',
+                  area_id: {{ area_id }}
+                }
+    default: []
+mode: single
