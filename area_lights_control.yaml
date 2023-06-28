@@ -15,7 +15,7 @@ blueprint:
         entity:
           domain: input_number
 
-    color_position_control:
+    color_control:
       name: color position counter to store current selection
       selector:
         entity:
@@ -23,7 +23,7 @@ blueprint:
 variables:
   area_id: !input 'area_id'
   brightness_input_control: !input brightness_input_control
-  color_position_control: !input color_position_control
+  color_control: !input color_control
 
 action:
   - variables:
@@ -64,12 +64,12 @@ action:
           kelvin: "6500"
           brightness_pct: "{{ states(brightness_input_control) }}"
         area: "{{area_id}}"
-    current_color: "{{states(color_position_control)}}"
+    current_color: "{{states(color_control)}}"
     selected_color: "{{colors[current_color % 9]}}"
   - service: counter.increment
     data: {}
     target:
-      entity_id: "{{color_position_control}}"
+      entity_id: "{{color_control}}"
   - event: test_event
     event_data:
       value: "{{selected_color}}"
