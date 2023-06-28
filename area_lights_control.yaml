@@ -1,58 +1,80 @@
 blueprint:
-  name: Area Light management through mqtt
-  description: 'Area Light management through mqtt'
+  name: Area Light management
+  description: Area Light management
   domain: automation
   input:
     area_id:
       name: area_id
-      description: 'Choose area to control'
+      description: Choose area to control
       selector:
-        area:
-    action_increase_brightness:
-      name: increase_brightness
-      description: 'Put tag id that commands brightness increase'
+        area: {}
+    brightness_input_control:
+      name: brightness_input_control
+      description: Put tag id that commands brightness increase
       selector:
-        text:
-    action_decrease_brightness:
-      name: decrease_brightness
-      description: 'Put tag id that commands brightness decrease'
-      selector:
-        text:
-    action_rotate_color:
-      name: rotate_color
-      description: select tag id that changes color
-      selector:
-        text:
-    action_kelvin_value:
-      name: change_kelvin_value
-      description: select tag that changes kelvin value
-      selector:
-        text:
+        entity:
+          domain: input_number
 
+    color_position_control:
+      name: color position counter to store current selection
+      selector:
+        entity:
+          domain: input_counter
 variables:
-  button_incr: !input action_increase_brightness
-  pressed_button: '{{ trigger.payload_json.RfReceived.Data}}'
-  area_id: !input area_id
+  area_id: !input 'area_id'
+  brightness_input_control: !input brightness_input_control
+  color_position_control: !input color_position_control
 
 trigger:
-  - platform: mqtt
-    topic: tele/BRIDGE/RESULT
-
-
+- platform: mqtt
+  topic: tele/BRIDGE/RESULT
 action:
-  - choose:
-      - conditions:
-        - condition: template
-          value_template: '{{pressed_button == button_incr}}'
-        sequence:
-          - service: mqtt.publish
-            data: 
-              topic: testes
-              payload_template: >-
-                {
-                  action: 'increase_brightness',
-                  pressed_button: ''{{ pressed_button }}'',
-                  area_id: {{ area_id }}
-                }
-    default: []
+  - variables:
+    colors:
+      - color_data:
+          color_name: red
+          brightness_pct: "{{ states(brightness_input_control) }}"
+        area: "{{area_id}}"
+      - color_data:
+          color_name: lightgreen
+          brightness_pct: "{{ states(brightness_input_control) }}"
+        area: "{{area_id}}"
+      - color_data:
+          color_name: orange
+          brightness_pct: "{{ states(brightness_input_control) }}"
+        area: "{{area_id}}"
+      - color_data:
+          color_name: blue
+          brightness_pct: "{{ states(brightness_input_control) }}"
+        area: "{{area_id}}"
+      - color_data:
+          color_name: pink
+          brightness_pct: "{{ states(brightness_input_control) }}"
+        area: "{{area_id}}"
+      - color_data:
+          color_name: teal
+          brightness_pct: "{{ states(brightness_input_control) }}"
+        area: "{{area_id}}"
+      - color_data:
+          kelvin: "2000"
+          brightness_pct: "{{ states(brightness_input_control) }}"
+        area: "{{area_id}}"
+      - color_data:
+          kelvin: "3500"
+          brightness_pct: "{{ states(brightness_input_control) }}"
+        area: "{{area_id}}"
+      - color_data:
+          kelvin: "6500"
+          brightness_pct: "{{ states(brightness_input_control) }}"
+        area: "{{area_id}}"
+    current_color: "{{states(color_position_control)}}"
+    selected_color: "{{colors[current_color % 9]}}"
+  - service: counter.increment
+    data: {}
+    target:
+      entity_id: "{{color_position_control}}"
+  - event: test_event
+    event_data:
+      value: "{{selected_color}}"
+      color: "{{current_color}}"
 mode: single
