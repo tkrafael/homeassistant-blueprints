@@ -25,9 +25,6 @@ variables:
   brightness_input_control: !input brightness_input_control
   color_position_control: !input color_position_control
 
-trigger:
-- platform: mqtt
-  topic: tele/BRIDGE/RESULT
 action:
   - variables:
     colors:
