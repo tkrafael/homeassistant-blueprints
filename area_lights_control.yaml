@@ -19,7 +19,7 @@ blueprint:
       name: color position counter to store current selection
       selector:
         entity:
-          domain: input_counter
+          domain: input_number
 variables:
   area_id: !input 'area_id'
   brightness_input_control: !input brightness_input_control
